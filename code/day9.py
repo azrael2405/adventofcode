@@ -8,17 +8,20 @@ def calculate_new_head_pos(head_pos, direction):
         head_pos = (head_pos[0]+1, head_pos[1])
     elif 'D' in direction.upper():
         head_pos = (head_pos[0]-1, head_pos[1])
-    
     return head_pos
 
 
-def calculate_tail_pos(old_head, head_pos, tail_pos):
+def calculate_tail_pos(head_pos, tail_pos):
     horizontal_diff = head_pos[1] - tail_pos[1]
     vertical_diff = head_pos[0] - tail_pos[0]
-
-    if abs(horizontal_diff) > 1 or abs(vertical_diff) > 1:
-        return old_head
+    if abs(horizontal_diff) > 1 and abs(vertical_diff) > 1:
+        return (int(tail_pos[0] + (vertical_diff / 2)), int(tail_pos[1] + (horizontal_diff / 2)))
+    elif abs(horizontal_diff) > 1:
+        return (tail_pos[0] + vertical_diff, int(tail_pos[1] + (horizontal_diff / 2)))
+    elif abs(vertical_diff) > 1:
+        return (int(tail_pos[0] + (vertical_diff / 2)), tail_pos[1] + horizontal_diff)
     return tail_pos
+
 
 if __name__ == '__main__':
     input = ''
@@ -26,24 +29,22 @@ if __name__ == '__main__':
     with open('../data/day9.txt', 'r') as iFile:
         input = iFile.read()
 
-    head_position = (0,0)
-    tail_position = (0,0)
-    tail_positions = [tail_position]
+    snake_length = 10
+    tail_position = []
+    for i in range(snake_length):
+        tail_position.append((0,0))
+    tail_positions = set()
+    tail_positions.add(tail_position[-1])
+    
     for line in input.splitlines():
         if not line: continue
         (direction, amount) = [x.strip() for x in line.split(' ') if x]
         for i in range(int(amount)):
-            print('old_head:', head_position)
-            new_head = calculate_new_head_pos(head_position, direction)
-            print('new_head:', new_head)
-            print('old_tail:', tail_position)
-            tail_position = calculate_tail_pos(head_position, new_head, tail_position)
-            print('new_tail:', tail_position)
-            tail_positions.append(tail_position)
-            head_position = new_head
-            print('-'*15)
-
-
-    print(tail_positions)
-    print(set(tail_positions))
-    print(f'answer1: {len(set(tail_positions))}')
+            new_positions = []
+            new_positions.append(calculate_new_head_pos(tail_position[0], direction))
+            for i, tail in enumerate(tail_position[1:], 1):
+                new_positions.append(calculate_tail_pos(new_positions[i-1], tail))
+            tail_position = new_positions
+            tail_positions.add(tail_position[-1])
+        
+    print(f'answer2: {len(tail_positions)}')
