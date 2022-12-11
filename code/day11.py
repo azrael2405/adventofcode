@@ -13,15 +13,15 @@ class Monkey:
         self.test_modulo = test
         self.answer_true = true
         self.answer_false = false
+        self.worry_reducer = 0
 
     def inspect(self):
         answers = []
         for _ in range(len(self.items)):
             self.inspect_count += 1
             item = self.items.pop(0)
-            new = self.operation(item)
-            print(f'Monkey {self.id}: {item} -> {new}')
-            new = math.floor(new / 3)
+            new = math.floor(self.operation(item) % self.worry_reducer)
+
             if (new % self.test_modulo) == 0:
                 answers.append((self.answer_true, new))
             else:
@@ -47,6 +47,7 @@ class MonkeyManager:
         self.monkeys: dict[str, Monkey] = {}
 
     def parse_monkeys(self):
+        global_worry_reducer = 1
         for monkey_line in input.split('\n\n'):
             if not monkey_line: continue
             number = -1
@@ -74,18 +75,18 @@ class MonkeyManager:
                 elif 'If false' in line:
                     false = line.split(' ')[-1]
             self.monkeys[number] = Monkey(number, starting_items, operation_string, test_num, true, false)
+            global_worry_reducer *= test_num
+        for monkey in self.monkeys.values():
+            monkey.worry_reducer = global_worry_reducer
 
     def parse_round(self):
         for key, monkey in self.monkeys.items():
-            print(monkey)
             items = monkey.inspect()
             for mon_key, item in items:
                 self.monkeys[mon_key].items.append(item)
 
     def get_monkey_business(self):
         sorted_monkeys = sorted([monkey.inspect_count for monkey in self.monkeys.values()], reverse=True)
-        print(sorted_monkeys)
-        print(sorted_monkeys[:2])
         return math.prod(sorted_monkeys[:2])
 
 
@@ -95,12 +96,11 @@ if __name__ == '__main__':
     with open(f'../data/day{day}.txt', 'r') as iFile:
         input = iFile.read()
 
-    rounds = 20
+    rounds = 10000
     manager = MonkeyManager(input)
     manager.parse_monkeys()
     for round_number in range(rounds):
         manager.parse_round()
-        print(f'cycle: {round_number}')
 
     monkey_business = manager.get_monkey_business()
-    print(f'answer1: {monkey_business}')
+    print(f'answer2: {monkey_business}')
