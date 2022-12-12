@@ -34,16 +34,13 @@ class Graph:
                 self.nodes[cur_node] = nodes
 
 
-    def heuristic(self, next_node):
-        return abs(self.start_pos[0]-next_node[0]) + abs(self.start_pos[1]-next_node[1])
-
-    def a_star(self):
-        open_list = [self.start_pos]
+    def a_star(self, start_pos):
+        open_list = [start_pos]
         closed_list = []
         came_from = {}
         cost_so_far = {}
-        came_from[self.start_pos] = None
-        cost_so_far[self.start_pos] = 0
+        came_from[start_pos] = None
+        cost_so_far[start_pos] = 0
 
         while len(open_list) > 0:
             cur_pos = open_list.pop(0)
@@ -59,23 +56,11 @@ class Graph:
                     came_from[next] = cur_pos
                     if next not in closed_list:
                         open_list.append(next)
-        return came_from, cost_so_far
+        return cost_so_far[self.end_pos]if self.end_pos in cost_so_far else 1000000000000000
 
     def path_length(self):
-        came_from, cost_so_far = self.a_star()
-
-        print(cost_so_far[self.end_pos])
-        path_length = 0
-        cur_pos = self.end_pos
-        while cur_pos != None:
-            cur_pos = came_from[cur_pos]
-            path_length += 1
-        
-        return path_length
-
-                
-
-
+        costs = [self.a_star(start_pos) for start_pos in self.start_pos]        
+        return min(costs)
 
 
 if __name__ == '__main__':
@@ -86,22 +71,25 @@ if __name__ == '__main__':
 
     alpha_array = list(string.ascii_lowercase)
     height_map = []
-    start_pos = ()
+    start_pos = []
     end_pos = ()
     for row_index, line in enumerate(input.splitlines()):
         if not line: continue
         height_map.append([])
         for col_index, letter in enumerate(line):
             if letter == 'S':
-                start_pos = (row_index, col_index)
+                start_pos.append((row_index, col_index))
+                
                 height_map[row_index].append(alpha_array.index('a'))
             elif letter == 'E':
                 end_pos = (row_index, col_index)
                 height_map[row_index].append(alpha_array.index('z'))
             else:
+                if letter == 'a':
+                    start_pos.append((row_index, col_index))
                 height_map[row_index].append(alpha_array.index(letter))
-
+    print(start_pos)
 
     graph = Graph(height_map, start_pos, end_pos)
     graph.build_graph()
-    print(f'answer1: {graph.path_length()}')
+    print(f'answer2: {graph.path_length()}')
