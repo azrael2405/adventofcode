@@ -1,4 +1,5 @@
 import ast
+import math
 
 def check_in_order(left, right):
     answer = None
@@ -34,13 +35,18 @@ if __name__ == '__main__':
         input = iFile.read()
 
     index_sum = 0
-    for index, data_lines in enumerate(input.split('\n\n'), 1):
-        if not data_lines: continue
-        (left_str, right_str) = data_lines.split('\n')
-        left = ast.literal_eval(left_str)
-        right = ast.literal_eval(right_str)
-        if check_in_order(left, right):
-            index_sum += index
-
-    print(f'answer1: {index_sum}')
+    dividers = ([[2]], [[6]])
+    packets = [[[2]], [[6]]]
+    for line in input.splitlines():
+        if not line: continue
+        new_packet = ast.literal_eval(line)
+        index = 0
+        for parsed_packet in packets:
+            if check_in_order(parsed_packet, new_packet):
+                index += 1
+            else:
+                break
+        packets.insert(index, new_packet)
+    divider_sum = math.prod([i for i, p in enumerate(packets, 1) if p in dividers ])
+    print(f'answer2: {divider_sum}')
 
