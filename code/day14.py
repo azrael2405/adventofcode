@@ -1,0 +1,6 @@
+
+if __name__ == '__main__':
+    input = ''
+    day = 14
+    with open(f'../data/day{day}.txt', 'r') as iFile:
+        input = iFile.read()
