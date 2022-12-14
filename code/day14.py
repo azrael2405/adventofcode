@@ -50,8 +50,17 @@ class Cave:
                     continue
 
     def sand_can_fall(self, sand_pos):
-        new_y = min([y for y in self.walls.keys() if y > sand_pos[1]])
-        y_wall_to_check = self.walls.get(new_y, [])
+        try:
+            new_y = self.max_y + 2
+            walls = [y for y in self.walls.keys() if y > sand_pos[1]]
+            if walls:
+                new_y = min(walls)
+        except Exception as e:
+            print(walls, type(walls))
+            raise e
+        y_wall_to_check = self.walls.get(new_y, set())
+        if new_y == self.max_y + 2:
+            return (False, (sand_pos[0], new_y - 1))
         if sand_pos[0] not in y_wall_to_check:
             return (True, (sand_pos[0], new_y))
         elif sand_pos[0] - 1 not in y_wall_to_check:
@@ -68,12 +77,6 @@ class Cave:
             if sand_amount % 400 == 0:
                 self.print_image(sand_amount)
             while True:
-                if (
-                    sand_pos[0] < self.min_x
-                    or sand_pos[0] > self.max_x
-                    or sand_pos[1] > self.max_y
-                ):
-                    return sand_amount
                 (can_fall, sand_pos) = self.sand_can_fall(sand_pos)
                 if not can_fall:
                     print(sand_pos)
@@ -81,6 +84,8 @@ class Cave:
                         self.walls[sand_pos[1]] = set()
                     self.walls[sand_pos[1]].add(sand_pos[0])
                     sand_amount += 1
+                    if sand_pos == self.sand_creation_pos:
+                        return sand_amount
                     break
     
     def print_image(self, sand_amount):
