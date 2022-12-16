@@ -1,12 +1,12 @@
 from pprint import pprint
 class Graph:
     def __init__(self) -> None:
-        self.time_out = 30
+        self.time_out = 26
         self.start_valve = 'AA'
         self.time_open_valve = 1
         self.time_traverse_tunnel = 1
         self.valves = {}
-        self.valve_graph = {}
+        self.cost_graph = {}
         self.rentability = {}
     
     def parse_graph(self, input: str):
@@ -25,11 +25,11 @@ class Graph:
             open_list = [valve]
             cost = {}
             cost[valve] = 0
-            self.valve_graph[valve] = {}
+            self.cost_graph[valve] = {}
             while len(open_list) > 0:
                 node = open_list.pop(0)
                 if self.valves[node]['flow_rate'] > 0:
-                    self.valve_graph[valve][node] = cost[node]
+                    self.cost_graph[valve][node] = cost[node]
                 for sub_node in self.valves[node]['tunnel_valves']:
                     new_cost = cost[node] + self.time_traverse_tunnel
                     if new_cost < cost.get(sub_node, 9999999999):
@@ -45,26 +45,27 @@ class Graph:
         paths = []
         valves = [
             (valve, cost)
-            for valve, cost in self.valve_graph[new_node].items()
+            for valve, cost in self.cost_graph[new_node].items()
             if valve not in traversed_valves
                 and (cost + self.time_open_valve) <= time_left
         ]
-        # print('S:', new_node, self.valves[new_node]['flow_rate'], time_left, current_value, values)
         if not valves:
-            return ([f'{new_node}[{time_left}]'],[current_value])
+            return ([f'{new_node}'],[current_value])
         for (valve, cost) in valves:
             (path, value) = self.traverse(valve, time_left - cost - self.time_open_valve, traversed_valves)
-            # print('L:',new_node, value)
             values.extend(map(lambda x: x+ current_value, value))
-            paths.extend(map(lambda x: f'{new_node}[{time_left}]_{x}', path))
-        # print('E:',new_node, values)
+            paths.extend(map(lambda x: f'{new_node}_{x}', path))
         return (paths, values)
 
 
     def traverse_rentability(self):
-        (paths, values) = self.traverse(self.start_valve, self.time_out, [])
-        with open('day16_permutations.txt', 'w') as oFile:
-            pprint(list(zip(paths, values)), oFile)
+        (my_paths, my_values) = self.traverse(self.start_valve, self.time_out, [])
+        values = []
+        for pos, path in enumerate(my_paths):
+            print(pos, '/', len(my_paths))
+            (elephant_paths, elephant_values) = self.traverse(self.start_valve, self.time_out, path.split('_'))
+            values.append(max(elephant_values) + my_values[pos])
+
         return max(values)
 
 if __name__ == '__main__':
@@ -78,6 +79,6 @@ if __name__ == '__main__':
     # parse input to workable datatype
     graph = Graph()
     graph.parse_graph(input)
-    print(f'answer1: {graph.traverse_rentability()}')
+    print(f'answer2: {graph.traverse_rentability()}')
     # pprint(graph.valve_graph)
 
