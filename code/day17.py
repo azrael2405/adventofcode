@@ -1,4 +1,7 @@
 
+import math
+
+
 def parse_rocks() -> list[list[str]]:
     rocks = '''####
 
@@ -27,7 +30,8 @@ class Tetris:
         self.rocks = parse_rocks()
         self.next_rock = 0
         self.game_field = []
-        self.rock_limit = 2022
+        self.rock_limit = 50_000
+        self.total_limit = 1000000000000
         self.movement = []
         self.next_movement = 0
         self.empty_line = list('.' * self.width)
@@ -122,13 +126,25 @@ class Tetris:
         
         
     def play(self):
+        rock_height = [0]
         for rock_number in range(self.rock_limit):
-            print(rock_number+1, '/', self.rock_limit)
+            if rock_number != 0 and self.next_movement == 0 and self.next_rock == 0:
+                break
+            if rock_number+1 % 1000 == 0:
+                print(rock_number+1, '/', self.rock_limit)
             new_rock = self.get_next_rock()
             self.play_with_rock(new_rock)
-        with open('day17_tower.txt', 'w') as oFile:
-            oFile.write('\n'.join([''.join(line) for line in self.game_field]))
-        return len(self.game_field)        
+            rock_height.append(len(self.game_field))
+        str_rock_diff = ''.join([str(rock_height[i] - rock_height[i-1]) for i in range(1,len(rock_height))])
+        front = [int(x) for x in list(str_rock_diff[:5000])]
+        rest = str_rock_diff[5000:]
+        search_cycle_str = rest[:100]
+        second_pos = rest.index(search_cycle_str, 1)
+        cycle = [int(x) for x in rest[:second_pos]]
+        div_res = (self.total_limit - len(front)) // len(cycle)
+        mod_res = (self.total_limit - len(front)) % len(cycle)
+        total_height = sum(front) + sum(cycle) * div_res + sum(cycle[:mod_res])
+        return total_height
 
 
     
@@ -141,7 +157,7 @@ if __name__ == '__main__':
         input = iFile.read()
     tetris = Tetris()
     tetris.parse_input(input)
-    print(f'answer1: {tetris.play()}')
+    print(f'answer2: {tetris.play()}')
     
 
 
