@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"helper"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
+
+
 
 func check_error(e error){
 	if e != nil{
@@ -56,6 +60,7 @@ func game_split(line string) (int, map[string]int){
 
 
 func parse_answer_one(_data []string){
+	defer helper.TimeTrack(time.Now(), "Answer 1")
 	game_max := map[string]int{
 		"red": 12,
 		"green": 13,
@@ -80,6 +85,7 @@ func parse_answer_one(_data []string){
 
 
 func parse_answer_two(_data []string){
+	defer helper.TimeTrack(time.Now(),"Answer 2")
 	answer := 0
 	for _, data_line := range _data {
 		_, cube_map := game_split(data_line)
@@ -94,8 +100,10 @@ func parse_answer_two(_data []string){
 }
 
 func main (){
+	defer helper.TimeTrack(time.Now(), "main")
 	filepath := os.Args[1]
 	data_array := parse_input_from_file(filepath)
+
 	parse_answer_one(data_array)
 	parse_answer_two(data_array)
 }

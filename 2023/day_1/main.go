@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"helper"
 	"os"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func check_error(e error){
@@ -23,6 +25,7 @@ func parse_input_from_file(filepath string) []string{
 }
 
 func parse_answer_one(_data []string){
+	defer helper.TimeTrack(time.Now(), "Answer 1")
 	re := regexp.MustCompile("\\d{1}")
 	answer_sum := 0
 	for _, data_line := range _data {
@@ -59,6 +62,7 @@ func convert_word_to_integer_string(word string) string {
 }
 
 func parse_answer_two(_data []string){
+	defer helper.TimeTrack(time.Now(), "Answer 2")
 	number_re := regexp.MustCompile("\\d{1}")
 	text_re := []*regexp.Regexp {
 		regexp.MustCompile("one|three|four|five|six|seven"),
@@ -93,6 +97,7 @@ func parse_answer_two(_data []string){
 }
 
 func main (){
+	defer helper.TimeTrack(time.Now(), "main")
 	filepath := os.Args[1]
 	data_array := parse_input_from_file(filepath)
 	// parse_answer_one(data_array)
