@@ -16,8 +16,8 @@ func check_error(e error){
 
 func parse_input_from_file(filepath string) []string{
 	file_data, file_error := os.ReadFile(filepath)
-	lines := strings.Fields(string(file_data))
 	check_error(file_error)
+	lines := strings.Fields(string(file_data))
 	return lines
 }
 

@@ -19,8 +19,8 @@ func check_error(e error){
 
 func parse_input_from_file(filepath string) []string{
 	file_data, file_error := os.ReadFile(filepath)
-	lines := strings.Fields(string(file_data))
 	check_error(file_error)
+	lines := strings.Fields(string(file_data))
 	return lines
 }
 
@@ -73,6 +73,7 @@ func parse_answer_two(_data []string){
 	for _, data_line := range _data {
 		number_result := number_re.FindAllStringIndex(data_line, -1)
 		text_result := [][]int{}
+		
 		for _, regex := range text_re{
 			text_result = append(text_result, regex.FindAllStringIndex(data_line, -1)...)
 		}
@@ -87,9 +88,9 @@ func parse_answer_two(_data []string){
 		last = convert_word_to_integer_string(last)
 		answer, conversion_error := strconv.Atoi(fmt.Sprintf("%s%s", first, last))
 		check_error((conversion_error))
-		fmt.Println(data_line)
-		fmt.Println(answer)
-		fmt.Println("------------------")
+		// fmt.Println(data_line)
+		// fmt.Println(answer)
+		// fmt.Println("------------------")
 		answer_sum += answer
 	}
 	fmt.Println("Answer 2:", answer_sum)
@@ -100,7 +101,7 @@ func main (){
 	defer helper.TimeTrack(time.Now(), "main")
 	filepath := os.Args[1]
 	data_array := parse_input_from_file(filepath)
-	// parse_answer_one(data_array)
+	parse_answer_one(data_array)
 	parse_answer_two(data_array)
 }
 

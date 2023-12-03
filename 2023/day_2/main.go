@@ -33,8 +33,8 @@ func Min(x, y int) int {
 
 func parse_input_from_file(filepath string) []string{
 	file_data, file_error := os.ReadFile(filepath)
-	lines := strings.Split(string(file_data), "\n")
 	check_error(file_error)
+	lines := strings.Split(string(file_data), "\n")
 	return lines
 }
 
@@ -96,14 +96,12 @@ func parse_answer_two(_data []string){
 		answer += game_power
 	}
 	fmt.Println("Answer 2:", answer)
-	
 }
 
 func main (){
 	defer helper.TimeTrack(time.Now(), "main")
 	filepath := os.Args[1]
 	data_array := parse_input_from_file(filepath)
-
 	parse_answer_one(data_array)
 	parse_answer_two(data_array)
 }
