@@ -13,11 +13,6 @@ import (
 var x_max = 0
 var y_max = 0
 
-func check_error(e error){
-	if e != nil{
-		panic(e)
-	}
-}
 
 type position struct{
 	x int
@@ -26,37 +21,18 @@ type position struct{
 	value string
 }
 
+
+func check_error(e error){
+	if e != nil{
+		panic(e)
+	}
+}
+
+
 func create_position_string(x,y int) string{
 	return fmt.Sprintf("%d;%d", x, y)
 }
 
-func find_symbol_positions(_data_array []string) map[string]bool  {
-	re := regexp.MustCompile(`[^\.\d]{1}`)
-	position_map := map[string]bool{}
-	for x, line := range _data_array{
-		result := re.FindAllStringIndex(line, -1)
-		for _, index := range result{
-			new_pos := create_position_string(x,index[0])
-			position_map[new_pos] = true
-		}
-
-	}
-	return position_map
-}
-
-func find_number_positions(_data_array []string) []*position{
-	re := regexp.MustCompile(`\d+`)
-	positions_list := []*position{}
-	for x, line := range _data_array{
-		result := re.FindAllStringIndex(line, -1)
-		for _, index := range result{
-			new_pos := position{x: x, y_start: index[0], y_end: index[1]-1, value: line[index[0]:index[1]]}
-			positions_list = append(positions_list, &new_pos)
-		}
-
-	}
-	return positions_list
-}
 
 func get_adjacent_positions(_pos *position) []string{
 	adjacent_positions := []string{}
@@ -87,6 +63,35 @@ func get_adjacent_positions(_pos *position) []string{
 	return adjacent_positions
 }
 
+
+func find_symbol_positions(_data_array []string, search_string string) map[string]bool  {
+	re := regexp.MustCompile(search_string)
+	position_map := map[string]bool{}
+	for x, line := range _data_array{
+		result := re.FindAllStringIndex(line, -1)
+		for _, index := range result{
+			new_pos := create_position_string(x,index[0])
+			position_map[new_pos] = true
+		}
+	}
+	return position_map
+}
+
+
+func find_number_positions(_data_array []string) []*position{
+	re := regexp.MustCompile(`\d+`)
+	positions_list := []*position{}
+	for x, line := range _data_array{
+		result := re.FindAllStringIndex(line, -1)
+		for _, index := range result{
+			new_pos := position{x: x, y_start: index[0], y_end: index[1]-1, value: line[index[0]:index[1]]}
+			positions_list = append(positions_list, &new_pos)
+		}
+	}
+	return positions_list
+}
+
+
 func find_adjacent_numbers(_symbol_map map[string]bool, _number_array []*position) []int{
 	return_list := []int{}
 	for _, number_pos := range _number_array{
@@ -103,6 +108,33 @@ func find_adjacent_numbers(_symbol_map map[string]bool, _number_array []*positio
 	return return_list
 }
 
+
+func find_gear_ratios(_symbol_map map[string]bool, _number_array []*position) []int{
+	return_list := []int{}
+	gears := map[string][]int{}
+	for _, number_pos := range _number_array{
+		adjacent_positions := get_adjacent_positions(number_pos)
+		for _, adjacent_position := range adjacent_positions{
+			if _, ok := _symbol_map[adjacent_position]; ok {
+				value, conversion_error := strconv.Atoi(number_pos.value)
+				check_error(conversion_error)
+				gears[adjacent_position] = append(gears[adjacent_position], value)
+			}
+		}
+	}
+	for _, value := range gears{
+		if len(value) > 1{
+			ratio := 1
+			for _, v := range value{
+				ratio *= v
+			}
+			return_list = append(return_list, ratio)
+		}
+	}
+	return return_list
+}
+
+
 func parse_input_from_file(filepath string) []string{
 	file_data, file_error := os.ReadFile(filepath)
 	check_error(file_error)
@@ -114,7 +146,7 @@ func parse_input_from_file(filepath string) []string{
 func parse_answer_one(_data []string){
 	defer helper.TimeTrack(time.Now(), "Answer 1")
 	answer := 0
-	symbol_positions := find_symbol_positions(_data)
+	symbol_positions := find_symbol_positions(_data, `[^\.\d]{1}`)
 	number_positions := find_number_positions(_data)
 	adjacent_numbers := find_adjacent_numbers(symbol_positions, number_positions)
 	for _, value := range adjacent_numbers {
@@ -126,10 +158,17 @@ func parse_answer_one(_data []string){
 
 func parse_answer_two(_data []string){
 	defer helper.TimeTrack(time.Now(), "Answer 2")
-	answer := ""
+	answer := 0
+	gear_positions := find_symbol_positions(_data, `\*{1}`)
+	number_positions := find_number_positions(_data)
+	gear_ratios := find_gear_ratios(gear_positions, number_positions)
+	for _, value := range gear_ratios {
+		answer += value
+	}
 	fmt.Println("Answer 2:", answer)
 	
 }
+
 
 func main (){
 	defer helper.TimeTrack(time.Now(), "main")
@@ -140,5 +179,3 @@ func main (){
 	parse_answer_one(data_array)
 	parse_answer_two(data_array)
 }
-
-
