@@ -3,23 +3,27 @@ package day5
 import (
 	"fmt"
 	"helper"
-	"os"
 	"slices"
+	"strconv"
+	"strings"
 	"time"
 )
+
+func parse_seeds(seeds_line string) []int{
+	seeds := []int{}
+	for _, seed := range strings.Split(strings.TrimSpace(strings.Split(seeds_line, ":")[1]), " "){
+		seed_int, conversion_error := strconv.Atoi(seed)
+		helper.Check_error(conversion_error)
+		seeds = append(seeds, seed_int)
+	}
+	return seeds
+}
 
 
 func Parse_answer_one(_data []string){
 	defer helper.TimeTrack(time.Now(), "Answer 1")
-	answer_map := parse_data_to_almanac(_data)
-	file, _ := os.Create("almanac.out")
-	defer file.Close()
-	for key, values := range answer_map{
-		file.WriteString(fmt.Sprintln(key))
-		for int_key, value := range values{
-			file.WriteString(fmt.Sprintln(int_key, value))
-		}
-	}
+	seeds := parse_seeds(_data[0])
+	answer_map := parse_data_to_almanac(_data[1:], seeds)
 	locations := []int{}
 	for key := range answer_map["location"]{
 		locations = append(locations, key)
