@@ -1,7 +1,6 @@
 package day6
 
 import (
-	"fmt"
 	"helper"
 	"regexp"
 	"strconv"
@@ -45,7 +44,6 @@ func parse_winning_moves(_races []*race_type) int{
 				winning_moves += 1
 			}
 		}
-		fmt.Println(race.time, race.distance, winning_moves)
 		answer *= winning_moves
 	}
 	return answer
