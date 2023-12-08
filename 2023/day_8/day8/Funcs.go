@@ -1,13 +1,12 @@
 package day8
 
 import (
-	"helper"
 	"regexp"
-	"time"
 )
 
 type map_type struct{
 	head *node_type
+	nodes_with_A_ending []*node_type
 	movement_string string
 }
 type node_type struct{
@@ -24,7 +23,7 @@ func (d *node_type) add_nodes(left, right *node_type){
 }
 
 func parse_data(_data_array []string) *map_type{
-	defer helper.TimeTrack(time.Now(), "parse data")
+	// defer helper.TimeTrack(time.Now(), "parse data")
 	movement_string := _data_array[0]
 	node_map := map[string]*node_type{}
 	reg := regexp.MustCompile(`\w{3}`)
@@ -33,9 +32,6 @@ func parse_data(_data_array []string) *map_type{
 		current_name := values[0]
 		left_name := values[1]
 		right_name := values[2]
-		// fmt.Println("-------------")
-		// fmt.Println(values)
-		// fmt.Println(current_name, left_name, right_name)
 		var current_node *node_type = nil
 		var left_node *node_type = nil
 		var right_node *node_type = nil
@@ -73,11 +69,15 @@ func parse_data(_data_array []string) *map_type{
 		current_node.add_nodes(left_node, right_node)
 		node_map[current_name] = current_node
 	}
-	// for key, node := range node_map{
-	// 	fmt.Println(key, "::", node.name, node.left.name, node.right.name)
-	// }
+	a_list := []*node_type{}
+	for key, value := range node_map{
+		if string(key[2]) == "A"{
+			a_list = append(a_list, value)
+		}
+	}
 	return &map_type{
 		head: node_map["AAA"],
+		nodes_with_A_ending: a_list,
 		movement_string: movement_string,
 	}
 }
