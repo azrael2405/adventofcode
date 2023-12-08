@@ -2,6 +2,7 @@ package day6
 
 import (
 	"helper"
+	"math"
 	"regexp"
 	"strconv"
 )
@@ -13,6 +14,22 @@ type race_type struct{
 
 func is_even(_number int) bool{
 	return _number % 2 > 0
+}
+
+func max(x, y int) int{
+	if x < y{
+		return y
+	}else{
+		return x
+	}
+}
+
+func min(x, y int) int{
+	if x > y{
+		return y
+	}else{
+		return x
+	}
 }
 
 func parse_data(_data_array []string) []*race_type{
@@ -37,14 +54,27 @@ func parse_data(_data_array []string) []*race_type{
 func parse_winning_moves(_races []*race_type) int{
 	answer := 1
 	for _, race := range _races{
-		winning_moves := 0
-		start_time := 1
-		for i := start_time; i < race.time; i++{
-			if i * (race.time-i) > race.distance{
-				winning_moves += 1
-			}
+		// ---------- quadratic function ------------
+		a := float64(1)
+		b := float64(-race.time)
+		c := float64( race.distance)
+		x1 := int((-b - math.Sqrt(b*b-4*a*c))/(2*a))
+		x2 := int((-b + math.Sqrt(b*b-4*a*c))/(2*a))
+		winning_moves := max(x1,x2) - min(x1, x2)
+		if is_even(race.time){
+			winning_moves -= 1
 		}
 		answer *= winning_moves
+
+		// ------------ brute_force -----------
+		// winning_moves := 0
+		// start_time := 1
+		// for i := start_time; i < race.time; i++{
+		// 	if i * (race.time-i) > race.distance{
+		// 		winning_moves += 1
+		// 	}
+		// }
+		// answer *= winning_moves
 	}
 	return answer
 }

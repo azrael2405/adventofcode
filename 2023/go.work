@@ -1,6 +1,7 @@
 go 1.21.4
 
 use (
+	./day_7
 	./day_6
 	./day_5
 	./day_4
