@@ -1,7 +1,7 @@
 package day7
 
 import (
-	"fmt"
+	// "fmt"
 	"helper"
 	"regexp"
 	"slices"
@@ -106,10 +106,10 @@ func find_strength(hand []string) int{
 	}
 	switch{
 	case len(values) == 5:
-		fmt.Println(hand, "::", values,"::", "high_card")
+		// fmt.Println(hand, "::", values,"::", "high_card")
 		output_value = int(HIGH_CARD)
 	case len(values) == 4:
-		fmt.Println(hand, "::", values,"::", "pair_one")
+		// fmt.Println(hand, "::", values,"::", "pair_one")
 		output_value = int(PAIR_ONE)
 	case len(values) == 3:
 		validation_array := []bool{}
@@ -119,10 +119,10 @@ func find_strength(hand []string) int{
 			}
 		}
 		if len(validation_array) == 2{
-			fmt.Println(hand, "::", values,"::", "pair_two")
+			// fmt.Println(hand, "::", values,"::", "pair_two")
 			output_value = int(PAIR_TWO)
 		} else {
-			fmt.Println(hand, "::", values,"::", "kind_three")
+			// fmt.Println(hand, "::", values,"::", "kind_three")
 			output_value = int(KIND_THREE)
 		}
 	case len(values) == 2:
@@ -133,14 +133,14 @@ func find_strength(hand []string) int{
 			}
 		}
 		if four_kind{
-			fmt.Println(hand, "::", values,"::", "kind_four")
+			// fmt.Println(hand, "::", values,"::", "kind_four")
 			output_value = int(KIND_FOUR)
 			} else{
-			fmt.Println(hand, "::", values,"::", "full_house")
+			// fmt.Println(hand, "::", values,"::", "full_house")
 			output_value = int(FULL_HOUSE)
 		}
 	case len(values) == 1:
-		fmt.Println(hand, "::", values,"::", "kind_five")
+		// fmt.Println(hand, "::", values,"::", "kind_five")
 		output_value = int(KIND_FIVE)
 	}
 	return output_value
@@ -211,7 +211,7 @@ func compare_hand_cards(left, right []string, pos int) int{
 func count_answer(_hands []*hand_type) int{
 	answer := 0
 	for index, hand := range _hands{
-		fmt.Println(index+1, "::", hand.cards, "::", hand.strength, "::", hand.bid)
+		// fmt.Println(index+1, "::", hand.cards, "::", hand.strength, "::", hand.bid)
 		answer += (index + 1)*hand.bid
 	}
 	return answer
