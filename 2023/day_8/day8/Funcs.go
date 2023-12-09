@@ -11,8 +11,6 @@ type map_type struct{
 }
 type node_type struct{
 	name string
-	left_name string
-	right_name string
 	left *node_type
 	right *node_type
 }

@@ -12,7 +12,6 @@ func find_exit(_data_map *map_type) int{
 	current_node := _data_map.head
 	for current_node.name != exit_name{
 		next_move := string(_data_map.movement_string[moves%len(_data_map.movement_string)])
-		// fmt.Println(current_node.name, next_move)
 		moves += 1
 		if next_move == "L"{
 			current_node = current_node.left
