@@ -1,7 +1,6 @@
 package day9
 
 import (
-	"fmt"
 	"helper"
 	"regexp"
 	"strconv"
@@ -53,18 +52,15 @@ func parse_data_to_values(_data_array []string, predict_future bool)[]int{
 			}
 			current_value_map[i+1] = new_array
 		}
-		fmt.Println(values)
 		for key := 0; key < len(current_value_map); key++{
 			if predict_future{
 				array := current_value_map[key]
 				prediction_value += array[len(array)-1]
 			} else {
 				array := current_value_map[len(current_value_map)-key-1]
-				fmt.Println(key,"::",len(current_value_map)-key-1, "::", prediction_value, "::", array)
 				prediction_value = array[0] - prediction_value
 			}
 		}
-		fmt.Println("-----------------------")
 		prediction_array = append(prediction_array, prediction_value)
 	}
 	return prediction_array
