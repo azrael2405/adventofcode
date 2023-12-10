@@ -14,10 +14,25 @@ const(
 	DOWN
 )
 
+func (d direction_type) to_string() string{
+	value := ""
+	switch d{
+	case LEFT:
+		value = "LEFT"
+	case RIGHT:
+		value = "RIGHT"
+	case UP:
+		value = "UP"
+	case DOWN:
+		value = "DOWN"
+	}
+	return value
+}
 type position_type struct{
 	x int
 	y int
 	from direction_type
+	to direction_type
 	value int
 }
 
@@ -102,6 +117,7 @@ func find_start_connections(_data_array []string, start_pos *position_type) []*p
 		pipe_dirs := get_directions_from_position(_data_array, check_pos.x, check_pos.y)
 		if len(pipe_dirs) > 0{
 			if slices.Contains(pipe_dirs, check_pos.from){
+				check_pos.to = pipe_dirs[(slices.Index(pipe_dirs, check_pos.from)+1)%2]
 				found_positions = append(found_positions, check_pos)
 			}
 		}
@@ -115,37 +131,3 @@ func get_directions_from_position(_data_array []string, x, y int)[]direction_typ
 	return pipe_directions[pipe_symbol]
 }
 
-
-func run_loop(_data_array []string, _start_connections []*position_type) int {
-	position_value := 0
-	current_positions := _start_connections
-	for {
-		if current_positions[0].x == current_positions[1].x && current_positions[0].y == current_positions[1].y{
-			position_value = current_positions[0].value
-			break
-		}
-		next_positions := []*position_type{}
-		for _, current_pos := range current_positions{
-			current_directions := get_directions_from_position(_data_array, current_pos.x, current_pos.y)
-			from_dir_index := slices.Index(current_directions, current_pos.from)
-			next_dir := current_directions[(from_dir_index+1)%2]
-			position_offset := go_to(next_dir)
-			next_positions = append(next_positions, &position_type{
-				x: current_pos.x + position_offset.x,
-				y: current_pos.y + position_offset.y,
-				value: current_pos.value + 1,
-				from: opposite_direction(next_dir),
-			})
-		}
-
-		current_positions = next_positions
-	}
-	return position_value
-}
-
-
-func run_game(_data_array []string) int{
-	start_pos := find_start_pos(_data_array)
-	start_connections := find_start_connections(_data_array, start_pos)
-	return run_loop(_data_array, start_connections)
-}
