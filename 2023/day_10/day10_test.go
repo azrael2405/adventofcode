@@ -1,7 +1,7 @@
-package day10
+package main
 
 import (
-	"day_10/day10"
+	"day10/day10"
 	"testing"
 )
 
