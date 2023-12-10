@@ -75,7 +75,6 @@ func find_start_pos(_data_array []string)*position_type{
 		if len(positions) > 0{
 			s_position.x = x
 			s_position.y = positions[0]
-			
 			break
 		}
 	}

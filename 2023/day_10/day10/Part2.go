@@ -18,20 +18,16 @@ func find_right_side(from, to direction_type) bool{
 	}
 }
 
-func run_loop_part2(_data_array []string, _start_connections []*position_type) int {
+
+func run_loop_part2(_data_array []string, _start_connection *position_type) int {
 	loop_positions := []*position_type{}
 	inside_positions := 0
-	current_position := _start_connections[1]
+	current_position := _start_connection
 	
 	for {
-		// fmt.Println("------------")
-		// fmt.Println("current_pos:",current_position.x, current_position.y)
 		current_directions := get_directions_from_position(_data_array, current_position.x, current_position.y)
-		// fmt.Println("current_directions:",current_directions)
 		from_dir_index := slices.Index(current_directions, current_position.from)
-		// fmt.Println("from_dir_index:", from_dir_index, (from_dir_index+1)%2)
 		next_dir := current_directions[(from_dir_index+1)%2]
-		// fmt.Println("next_dir:", next_dir)
 		current_position.to = next_dir
 		if slices.ContainsFunc(loop_positions, func (element *position_type) bool{
 			if element.x == current_position.x && element.y == current_position.y{
@@ -64,11 +60,6 @@ func run_loop_part2(_data_array []string, _start_connections []*position_type) i
 		}
 		return value
 	})
-	// fmt.Println("--------")
-	// for _,pos := range loop_positions{
-	// 	// fmt.Println(pos.x, pos.y, pos.to.to_string())
-	// }
-	// fmt.Println("--------")
 	for x, data_line := range _data_array{
 		for y := range data_line{
 			if slices.ContainsFunc(loop_positions, func (element *position_type) bool{
@@ -88,13 +79,7 @@ func run_loop_part2(_data_array []string, _start_connections []*position_type) i
 			if next_loop_index != -1{
 				if! find_right_side(loop_positions[next_loop_index].from, loop_positions[next_loop_index].to){
 					inside_positions += 1
-					fmt.Println(
-						"inside:", x, y,
-						loop_positions[next_loop_index].from.to_string(),
-						loop_positions[next_loop_index].to.to_string(),
-						loop_positions[next_loop_index].x,
-						loop_positions[next_loop_index].y,
-					)
+					
 				}
 			}
 		}
@@ -106,17 +91,12 @@ func run_loop_part2(_data_array []string, _start_connections []*position_type) i
 func run_game_part2(_data_array []string) int{
 	start_pos := find_start_pos(_data_array)
 	start_connections := find_start_connections(_data_array, start_pos)
-	for _, con := range start_connections{
-		fmt.Println(con.from.to_string(), con.to.to_string())
-	}
-	fmt.Println("S:", opposite_direction(start_connections[0].from).to_string(),
-	opposite_direction(start_connections[1].from).to_string())
-	
 	pipe_directions["S"] = []direction_type{
 		opposite_direction(start_connections[0].from),
 		opposite_direction(start_connections[1].from),
 	}
-	return run_loop_part2(_data_array, start_connections)
+	fmt.Println(pipe_directions["S"])
+	return run_loop_part2(_data_array, start_pos)
 }
 
 
