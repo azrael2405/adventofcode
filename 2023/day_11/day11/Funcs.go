@@ -3,6 +3,7 @@ package day11
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 )
 
 
@@ -16,6 +17,14 @@ type position_type struct {
 
 func (p position_type) to_string() string{
 	return fmt.Sprintf("%2d: %5d + %2d / %5d + %2d", p.key, p.x, p.x_expansion, p.y, p.y_expansion)
+}
+
+func pow (x, y int)int{
+	output := 1
+	for i:= 0; i < y; i++{
+		output *=x
+	}
+	return output
 }
 
 func abs(value int)int{
@@ -128,8 +137,10 @@ func game_it(_data_array []string, expansion int) int{
 	galaxies := find_galaxies(_data_array)
 	empty_spaces := find_empty_spaces(galaxies, len(_data_array), len(_data_array[0]))
 	galaxies = expand_galaxies(galaxies, empty_spaces["empty_rows"], empty_spaces["empty_cols"])
-	print_galaxies(galaxies)
-	shortest_paths := find_shortest_routes_between_galaxies(galaxies, expansion)
+	// print_galaxies(galaxies)
+	expansion_string := strconv.Itoa(expansion)
+	fmt.Println(expansion_string, len(expansion_string))
+	shortest_paths := find_shortest_routes_between_galaxies(galaxies, expansion - 1)
 	
 	return sum(shortest_paths)
 }

@@ -8,7 +8,7 @@ import (
 
 func Parse_answer_two(_data []string)int{
 	defer helper.TimeTrack(time.Now(), "Answer 2")
-	answer := 0
+	answer := game_it(_data, 1_000_000)
 	fmt.Println("Answer 2:", answer)
 	return answer
 }
