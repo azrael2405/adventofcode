@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-func Parse_answer_two(_data []string)int{
+func Parse_answer_two(_data []string) int {
 	defer helper.TimeTrack(time.Now(), "Answer 2")
-	answer := 0
+	answer := parse_data(_data)
 	fmt.Println("Answer 2:", answer)
 	return answer
 }
