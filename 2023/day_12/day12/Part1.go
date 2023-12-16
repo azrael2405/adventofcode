@@ -9,7 +9,7 @@ import (
 
 func Parse_answer_one(_data []string) int{
 	defer helper.TimeTrack(time.Now(), "Answer 1")
-	answer := solver(_data)
+	answer := solver(_data, 1)
 	fmt.Println("Answer 1:", answer)
 	return answer
 }
