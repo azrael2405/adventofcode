@@ -11,7 +11,7 @@ import (
 func parse_input_from_file(filepath string) []string{
 	file_data, file_error := os.ReadFile(filepath)
 	helper.Check_error(file_error)
-	lines := strings.Split(string(file_data), "\n")
+	lines := strings.Split(string(file_data), "\n\n")
 	return lines
 }
 
