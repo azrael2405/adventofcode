@@ -1,10 +1,11 @@
 package structs
 
 type Tilemap struct {
-	_tiles [][]*Tile
-	Start  *Tile
-	_max_x int
-	_max_y int
+	_tiles     [][]*Tile
+	Start      *Beam
+	StartArray []*Beam
+	_max_x     int
+	_max_y     int
 }
 
 func (tilemap *Tilemap) Init(_max_x, _max_y int) {
@@ -25,15 +26,27 @@ func (tilemap *Tilemap) Set_tile(_x, _y int, _type string) {
 	new_tile.Init(_position, _type)
 	tilemap._tiles[_y][_x] = new_tile
 	if _x == 0 && _y == 0 {
-		tilemap.Start = new_tile
+		tilemap.Start = &Beam{Tile: new_tile, To: RIGHT}
+	}
+	if _x == 0 {
+		tilemap.StartArray = append(tilemap.StartArray, &Beam{Tile: new_tile, To: RIGHT})
+	}
+	if _y == 0 {
+		tilemap.StartArray = append(tilemap.StartArray, &Beam{Tile: new_tile, To: DOWN})
+	}
+	if _x == tilemap._max_x-1 {
+		tilemap.StartArray = append(tilemap.StartArray, &Beam{Tile: new_tile, To: LEFT})
+	}
+	if _y == tilemap._max_y-1 {
+		tilemap.StartArray = append(tilemap.StartArray, &Beam{Tile: new_tile, To: UP})
 	}
 }
 
 func (tilemap *Tilemap) Link_tiles() {
 	for _, values := range tilemap._tiles {
 		for _, tile := range values {
-			_x := tile._position.X
-			_y := tile._position.Y
+			_x := tile.Position.X
+			_y := tile.Position.Y
 			if _y-1 >= 0 {
 				tile._next[UP] = tilemap._tiles[_y-1][_x]
 			}
@@ -56,6 +69,8 @@ func (tilemap *Tilemap) Get_result() int {
 		for _, tile := range tile_row {
 			if tile._energized > 0 {
 				result += 1
+				tile._energized = 0
+				tile._visited_from = []direction{}
 			}
 		}
 	}

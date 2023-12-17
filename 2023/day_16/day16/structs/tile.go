@@ -4,7 +4,7 @@ import "slices"
 
 type Tile struct {
 	_energized    int
-	_position     *Position
+	Position      *Position
 	_type         string
 	_next         map[direction]*Tile
 	_visited_from []direction
@@ -12,7 +12,7 @@ type Tile struct {
 
 func (tile *Tile) Init(_position *Position, _type string) {
 	tile._energized = 0
-	tile._position = _position
+	tile.Position = _position
 	tile._type = _type
 	tile._next = make(map[direction]*Tile)
 	tile._visited_from = make([]direction, 0)
