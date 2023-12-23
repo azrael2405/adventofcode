@@ -1,0 +1,221 @@
+package day17
+
+import (
+	"helper"
+	"math"
+	"strconv"
+	"strings"
+)
+
+type direction int
+
+const (
+	UP direction = iota
+	RIGHT
+	DOWN
+	LEFT
+)
+
+func (d direction) turn_left(current_direction direction) direction {
+	return (current_direction + 3) % 4
+}
+
+func (d direction) turn_right(current_direction direction) direction {
+	return (current_direction + 1) % 4
+}
+
+type position struct {
+	x int
+	y int
+}
+
+type move struct {
+	from            *position
+	dir             direction
+	direction_count int
+	to              *position
+	counter         int
+	last_move       *move
+}
+
+type map_node struct {
+	pos            *position
+	position_value int
+	total_value    int
+	move           *move
+}
+
+type position_map struct {
+	positions map[int]map[int]*map_node
+}
+
+func (p *position_map) get_position(_x int, _y int) *map_node {
+	return p.positions[_y][_x]
+}
+
+func (p *position_map) set_position(_x int, _y int, _position *map_node) {
+	p.positions[_y][_x] = _position
+}
+
+func (p *position_map) create_map(_data_array []string) {
+	p.positions = map[int]map[int]*map_node{}
+	for y, line := range _data_array {
+		p.positions[y] = make(map[int]*map_node)
+		for x, char := range line {
+			value, ok := strconv.Atoi(string(char))
+			helper.Check_error(ok)
+			p.positions[y][x] = &map_node{&position{x, y}, value, math.MaxInt, nil}
+		}
+	}
+
+}
+
+func (p position) get_next_position(dir direction) *position {
+	switch dir {
+	case UP:
+		return &position{p.x, p.y - 1}
+	case RIGHT:
+		return &position{p.x + 1, p.y}
+	case DOWN:
+		return &position{p.x, p.y + 1}
+	case LEFT:
+		return &position{p.x - 1, p.y}
+	}
+	return &position{0, 0}
+}
+
+func (p position) is_valid(_data_array []string) bool {
+	return p.x >= 0 && p.x < len(_data_array[0]) && p.y >= 0 && p.y < len(_data_array)
+}
+
+func min(_array []int) int {
+	min_value := _array[0]
+	for _, value := range _array {
+		if value < min_value {
+			min_value = value
+		}
+	}
+	return min_value
+}
+func print_move_map(_move_list []*move, _last_move *move, _data_array []string) {
+	array_copy := make([]string, len(_data_array))
+	copy(array_copy, _data_array)
+
+	for {
+		if _last_move == nil {
+			break
+		}
+		symbol := "X"
+		if _last_move.dir == UP {
+			symbol = "^"
+		} else if _last_move.dir == RIGHT {
+			symbol = ">"
+		} else if _last_move.dir == DOWN {
+			symbol = "v"
+		} else if _last_move.dir == LEFT {
+			symbol = "<"
+		}
+		array_copy[_last_move.to.y] = array_copy[_last_move.to.y][:_last_move.to.x] + symbol + array_copy[_last_move.to.y][_last_move.to.x+1:]
+		_last_move = _last_move.last_move
+	}
+	for _, move := range _move_list {
+		symbol := "."
+		if strings.Contains("0123456789", string(array_copy[move.to.y][move.to.x])) {
+			array_copy[move.to.y] = array_copy[move.to.y][:move.to.x] + symbol + array_copy[move.to.y][move.to.x+1:]
+		}
+	}
+	println()
+	for _, line := range array_copy {
+		println(line)
+	}
+	println()
+}
+
+func find_path(_data_array []string, _start_move *move) int {
+	// func find_path(_data_array []string) int {
+	pos_map := position_map{}
+	pos_map.create_map(_data_array)
+	open_list := make([]*move, 0)
+	open_list = append(
+		open_list,
+		_start_move,
+		// &move{&position{0, 0}, RIGHT, 1, &position{1, 0}, 0, nil},
+		// &move{&position{0, 0}, DOWN, 1, &position{0, 1}, 0, nil},
+	)
+	end_pos := &position{len(_data_array[0]) - 1, len(_data_array) - 1}
+	move_list := make([]*move, 0)
+	for len(open_list) > 0 {
+		current_move := open_list[0]
+		// println("checking", current_move.to.x, current_move.to.y, current_move.counter, current_move.direction_count, current_move.dir)
+		open_list = open_list[1:]
+		current_node := pos_map.get_position(current_move.to.x, current_move.to.y)
+		new_value := current_move.counter + current_node.position_value
+		move_list = append(move_list, current_move)
+		if current_node.total_value > new_value {
+			current_node.total_value = new_value
+			current_node.move = current_move
+			pos_map.set_position(current_move.to.x, current_move.to.y, current_node)
+			if current_move.to.x == end_pos.x && current_move.to.y == end_pos.y {
+				continue
+			}
+			// move forward
+			if current_move.direction_count < 3 {
+				next_pos := current_move.to.get_next_position(current_move.dir)
+				if next_pos.is_valid(_data_array) {
+					new_move := &move{
+						from:            current_move.to,
+						dir:             current_move.dir,
+						direction_count: current_move.direction_count + 1,
+						to:              next_pos,
+						counter:         new_value,
+						last_move:       current_move,
+					}
+					open_list = append(open_list, new_move)
+				}
+			}
+
+			// turn right
+			dir_right := current_move.dir.turn_right(current_move.dir)
+			pos_right := current_move.to.get_next_position(dir_right)
+			if pos_right.is_valid(_data_array) {
+				new_move := &move{
+					from:            current_move.to,
+					dir:             dir_right,
+					direction_count: 1,
+					to:              pos_right,
+					counter:         new_value,
+					last_move:       current_move,
+				}
+				open_list = append(open_list, new_move)
+			}
+			// turn left
+			dir_left := current_move.dir.turn_left(current_move.dir)
+			pos_left := current_move.to.get_next_position(dir_left)
+			if pos_left.is_valid(_data_array) {
+				new_move := &move{
+					from:            current_move.to,
+					dir:             dir_left,
+					direction_count: 1,
+					to:              pos_left,
+					counter:         new_value,
+					last_move:       current_move,
+				}
+				open_list = append(open_list, new_move)
+			}
+		}
+	}
+	print_move_map(move_list, pos_map.get_position(end_pos.x, end_pos.y).move, _data_array)
+	println(pos_map.get_position(end_pos.x, end_pos.y).total_value)
+	return pos_map.get_position(end_pos.x, end_pos.y).total_value
+}
+
+func parse_data(_data_array []string) int {
+	answer_value := min(
+		[]int{
+			find_path(_data_array, &move{&position{0, 0}, RIGHT, 1, &position{1, 0}, 0, nil}),
+			find_path(_data_array, &move{&position{0, 0}, DOWN, 1, &position{0, 1}, 0, nil}),
+		},
+	)
+	// answer_value := find_path(_data_array)
+	return answer_value
+}
